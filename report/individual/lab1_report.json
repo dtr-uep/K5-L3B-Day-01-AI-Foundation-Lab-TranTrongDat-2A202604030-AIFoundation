@@ -1,0 +1,145 @@
+{
+ "seed": 7883,
+ "predictions": {
+  "llm_models": {
+   "text": "model lớn có f1 cao hơn nhưng chênh thấp khoảng 0.005 đến 0.01, model lớn 10 lần, có thắng mô hình 3b",
+   "time": "16:09:33"
+  },
+  "llm_fewshot": {
+   "text": "F1 tăng chi phí tăng dựa trên số token thêm vào, dự đoán khoảng 1.5 lần",
+   "time": "16:13:06"
+  },
+  "ml_f1": {
+   "text": "F1 ~66.7%, với threshold 0.5, model có thể sẽ đoán ham tốt hơn vì ham chiếm đại đa số dữ liệu, model có thể sẽ đoán chủ yếu là negative, tức là False negative khiên recall thấp, trong khi false positive có thể sẽ thấp dẫn đến precision cao hơn recall.",
+   "time": "16:23:25"
+  },
+  "ml_lr": {
+   "text": "lr=0.001 thì đường loss sẽ mượt hơn và có thể sẽ converge, lr=50 thì đường loss sẽ giao động và không mượt.",
+   "time": "16:23:33"
+  },
+  "dl_curve": {
+   "text": "Loss validation không giảm mãi, có thể sẽ giảm đến plateu rồi flat hoặc giao động quanh 1 giá trị hoặc tăng lên. MLP có thể sẽ hơn logistic regression vì các feature liên quan đến các từ phổ biến được tương tác với nhau ở layer thứ 2 để cân nhắc phối hợp từ.",
+   "time": "16:24:28"
+  },
+  "dl_relu": {
+   "text": "Tương đương với Linear regression, vì không có activation functiuon, kết hợp 2 layer linear chính là tương đương với một layer linear duy nhất, F1 có thể sẽ tương đương Logistic Regression ở trên và thâp đi.",
+   "time": "16:24:41"
+  },
+  "emb_search": {
+   "text": "spam",
+   "time": "16:31:13"
+  },
+  "emb_tricky": {
+   "text": "3b. Encoder + LogReg đoán đúng nhiều hơn.",
+   "time": "16:35:28"
+  }
+ },
+ "checks": {
+  "4.2–4.3 prompt / parse_label": true,
+  "4.1 + 4.4 call_openai / llm_classify_batch": true,
+  "1.1 vectorize": true,
+  "1.2 sigmoid / predict_proba": true,
+  "1.3 train_logreg": true,
+  "1.4 metrics": true,
+  "2.1 build_mlp": true,
+  "2.2 train_mlp": true,
+  "3.1–3.2 cosine / top_k_similar": true,
+  "3.3 knn_predict": true
+ },
+ "experiments": [
+  {
+   "key": "llm_models",
+   "time": "16:09:34"
+  },
+  {
+   "key": "llm_fewshot",
+   "time": "16:13:11"
+  },
+  {
+   "key": "ml_f1",
+   "time": "16:23:25"
+  },
+  {
+   "key": "ml_lr",
+   "time": "16:23:33"
+  },
+  {
+   "key": "dl_curve",
+   "time": "16:24:28"
+  },
+  {
+   "key": "dl_relu",
+   "time": "16:24:41"
+  },
+  {
+   "key": "emb_search",
+   "time": "16:31:13"
+  },
+  {
+   "key": "emb_tricky",
+   "time": "16:35:28"
+  }
+ ],
+ "results": {
+  "1. BoW + LogReg (tự code)": {
+   "accuracy": 0.9716129302978516,
+   "precision": 0.9876543283462524,
+   "recall": 0.7920792102813721,
+   "f1": 0.8791208863258362,
+   "f1_SUB": 0.888888955116272,
+   "train_s": 6.20249213000352,
+   "msg_per_s": 8870.248015062283,
+   "p50_ms": 0.06022650268278085,
+   "p95_ms": 0.26517110272834044,
+   "usd_per_1k": 0.0
+  },
+  "2. BoW + MLP (deep learning)": {
+   "accuracy": 0.9819355010986328,
+   "precision": 0.9578947424888611,
+   "recall": 0.9009901285171509,
+   "f1": 0.9285714626312256,
+   "f1_SUB": 0.9473683834075928,
+   "train_s": 12.0996839799991,
+   "msg_per_s": 28268.62237978036,
+   "p50_ms": 0.22368300051311962,
+   "p95_ms": 0.2682679973077025,
+   "usd_per_1k": 0.0
+  },
+  "3a. Encoder (MiniLM) + kNN": {
+   "accuracy": 0.9793548583984375,
+   "precision": 0.8899082541465759,
+   "recall": 0.9603960514068604,
+   "f1": 0.9238095283508301,
+   "f1_SUB": 1.0,
+   "train_s": 202.72850124600518,
+   "msg_per_s": 9.557777437409108,
+   "p50_ms": 113.94255699997302,
+   "p95_ms": 377.2697353506371,
+   "usd_per_1k": 0.0
+  },
+  "3b. Encoder (MiniLM) + LogReg": {
+   "accuracy": 0.9858064651489258,
+   "precision": 0.9411764740943909,
+   "recall": 0.9504950642585754,
+   "f1": 0.9458128213882446,
+   "f1_SUB": 0.923076868057251,
+   "train_s": 203.94915238901012,
+   "msg_per_s": 10.131470587126637,
+   "p50_ms": 55.6855224967876,
+   "p95_ms": 125.73404754875801,
+   "usd_per_1k": 0.0
+  },
+  "3c. Encoder (MiniLM) + MLP head": {
+   "accuracy": 0.9870967864990234,
+   "precision": 0.9417475461959839,
+   "recall": 0.9603960514068604,
+   "f1": 0.9509803652763367,
+   "f1_SUB": 0.949999988079071,
+   "train_s": 206.67795309900976,
+   "msg_per_s": 9.850491246371774,
+   "p50_ms": 59.87921750420355,
+   "p95_ms": 147.0119997982692,
+   "usd_per_1k": 0.0
+  }
+ }
+}
