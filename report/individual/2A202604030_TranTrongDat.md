@@ -49,18 +49,37 @@ Dự đoán thay đổi đường loss trên learning rate, dự đoán là sẽ
 
 Dự đoán bỏ ReLU thì model sẽ ra kết quả kém hơn MLP nhưng f1 kết quả tốt hơn. MLP không hoàn toàn đúng trong mọi trường hợp, logistic regression với learning rate có kiểm soát có thể tốt hơn.
 
+Dự đoán ở phần stress test: dự đoán loại "Tưởng spam nhưng không phải" sẽ khiến BoW gặp khó khăn nhất nhưng hầu hết model đều làm tốt ở đây. Kỳ vọng là các từ spam sẽ nặng cho trọng số để dự đoán là ham nhưng có lẽ vì có nhiều từ ngữ thông thường nên BoW vẫn có thể đoán đúng.
+
 ## 4. Phân tích 50 case khó
 
 *Model nào tụt nhiều nhất, ở nhóm case nào? Nêu 2 case cụ thể và cơ chế khiến model sai.*
+Bị lỗi ở 2 model LLM ở một số phần, chủ yếu trả về None.
+Model tụt nhiều nhất không tính LLM về tổng thể là 2 model BoW. Tụt nhiều nhất ở phần Thao túng / Lừa Đảo, Spam giọng tự nhiên và đặc biệt là né từ khóa. Feature BoW phụ thuộc hoàn toàn vào sự xuất hiện của từ khóa đồng thời lại nhạy cảm với từ ngữ thông thường do thiên kiến về ham, từ đó dẫn đến model dễ bị sai ở các case mà các từ khóa cần thiết không có hoặc không đủ để dự đoán.
 
 ## 5. Thử thách cá nhân
 
 *Đề theo SEED của bạn, cách làm, kết quả, giải thích.*
+SEED = 7883
+Cách làm:  
+Prompt sửa requirement thành yêu cầu định dạng JSON với text (yêu cầu giống như chỉ label) và reason.
+Sử dụng regex để trích xuất phần trong ngoặc có nhóm pattern là "value":"key", sau đó dùng json.loads sau khi loại bỏ \n để trích dưới dạng json.
+
+Kết quả:
+Cho thấy chi phí tăng gấp 2 lần và độ trễ tăng 2s.
 
 ## 6. Phương án cho sản phẩm thật
 
 *Với yêu cầu p95 < 50 ms/tin cho 10 triệu SMS/ngày: chọn phương án nào, dẫn số liệu nào, chấp nhận đánh đổi gì.*
+Phương án chọn mô hình encoder (MiniLM) + LogReg có độ trễ phù hợp và loss thấp nhất, đồng thời trong stress test có phần thể hiện tương đương với các model khác. Chấp nhận sử dụng thêm token cho model Embedding nhưng chi phí vẫn rẻ hơn nhiều so với LLM.
 
 ## 7. AI log và điều đã học
 
 *Mỗi lần dùng AI: hỏi gì, nhận gì, bạn sửa gì. Sau đó 2–3 câu: điều bạn hiểu ra hôm nay mà trước đó chưa hiểu.*
+Đã sử dụng AI để tra cách dùng regex trích xuất JSON từ string text ở phần challenge. AI trả lời: re.search(r'{[^{}]*}', s) và đã copy nguyên cái đó thêm phần trích lấy nội dung từ match và xử lý None.
+
+Đã sử dụng AI để tra cách sử dụng time.perf_counter trong phần viết chạy llm theo batc. AI trả về full code mẫu, chỉ lấy phần sử dụng time.perf_count để cho vào code của bản thân.
+
+Đã sử dụng AI để tra câu code parser_label dựa trên nguyên đề bài, AI trả về full script đoạn parser đó, bản thân không sửa gì hơn.
+
+Hiện tại các regex pattern của AI trả về cũng chưa đủ để bao phủ tất cả các case, hiểu thêm rằng cần xử lý cả format đầu ra mà không hoàn toàn phụ thuộc vào AI bên cạnh các cách xử lý về bảo mật và nội dung.
